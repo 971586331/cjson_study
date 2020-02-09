@@ -3,8 +3,12 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
+
 SOURCES += main.c \
     cJSON.c
 
 HEADERS += \
     cJSON.h
+
+DISTFILES += \
+    read.json

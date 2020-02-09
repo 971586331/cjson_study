@@ -97,29 +97,29 @@ then using the CJSON_API_VISIBILITY flag to "export" the same symbols the way CJ
 #define cJSON_Raw    (1 << 7) /* raw json */
 
 #define cJSON_IsReference 256
-#define cJSON_StringIsConst 512
+#define cJSON_StringIsConst 512		//这个字符串是不变的
 
 /* The cJSON structure: */
 typedef struct cJSON
 {
     /* next/prev allow you to walk array/object chains. Alternatively, use GetArraySize/GetArrayItem/GetObjectItem */
-    struct cJSON *next;
-    struct cJSON *prev;
+    struct cJSON *next;	//指向下一个同级元素
+    struct cJSON *prev;	//指几上一个同级元素
     /* An array or object item will have a child pointer pointing to a chain of the items in the array/object. */
-    struct cJSON *child;
+    struct cJSON *child;	//指向子项
 
     /* The type of the item, as above. */
-    int type;
+    int type;	//项值的类型
 
     /* The item's string, if type==cJSON_String  and type == cJSON_Raw */
-    char *valuestring;
+    char *valuestring;	//如果是String，值存放在这里
     /* writing to valueint is DEPRECATED, use cJSON_SetNumberValue instead */
-    int valueint;
+    int valueint;		//如果是整型数，值存放在这里
     /* The item's number, if type==cJSON_Number */
-    double valuedouble;
+    double valuedouble;	//如果是浮点数，值存放在这里
 
     /* The item's name string, if this item is the child of, or is in the list of subitems of an object. */
-    char *string;
+    char *string;	//该项目的键名称
 } cJSON;
 
 typedef struct cJSON_Hooks
@@ -161,8 +161,10 @@ CJSON_PUBLIC(char *) cJSON_Print(const cJSON *item);
 CJSON_PUBLIC(char *) cJSON_PrintUnformatted(const cJSON *item);
 /* Render a cJSON entity to text using a buffered strategy. prebuffer is a guess at the final size. guessing well reduces reallocation. fmt=0 gives unformatted, =1 gives formatted */
 CJSON_PUBLIC(char *) cJSON_PrintBuffered(const cJSON *item, int prebuffer, cJSON_bool fmt);
-/* Render a cJSON entity to text using a buffer already allocated in memory with given length. Returns 1 on success and 0 on failure. */
-/* NOTE: cJSON is not always 100% accurate in estimating how much memory it will use, so to be safe allocate 5 bytes more than you actually need */
+/* Render a cJSON entity to text using a buffer already allocated in memory with given length. Returns 1 on success and 0 on failure. 
+	使用已经在内存中分配给定长度的缓冲区将cJSON实体呈现为文本。成功返回1，失败返回0。*/
+/* NOTE: cJSON is not always 100% accurate in estimating how much memory it will use, so to be safe allocate 5 bytes more than you actually need
+	注意：cJSON在估计将使用多少内存方面并不总是100％准确，因此，为了安全起见，请多分配5个字节的内存*/
 CJSON_PUBLIC(cJSON_bool) cJSON_PrintPreallocated(cJSON *item, char *buffer, const int length, const cJSON_bool format);
 /* Delete a cJSON entity and all subentities. */
 CJSON_PUBLIC(void) cJSON_Delete(cJSON *item);

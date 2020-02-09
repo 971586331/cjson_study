@@ -27,9 +27,11 @@ static int print_preallocated(cJSON *root)
     /* formatted print */
     out = cJSON_Print(root);
 
-    /* create buffer to succeed */
+    /* create buffer to succeed 创建成功的缓冲区 */
     /* the extra 5 bytes are because of inaccuracies when reserving memory */
     len = strlen(out) + 5;
+    printf("out = %s\n", out);
+
     buf = (char*)malloc(len);
     if (buf == NULL)
     {
@@ -37,7 +39,7 @@ static int print_preallocated(cJSON *root)
         exit(1);
     }
 
-    /* create buffer to fail */
+    /* create buffer to fail 创建失败的缓冲区 */
     len_fail = strlen(out);
     buf_fail = (char*)malloc(len_fail);
     if (buf_fail == NULL)
@@ -89,6 +91,12 @@ static void create_objects(void)
     cJSON *img = NULL;
     cJSON *thm = NULL;
     cJSON *fld = NULL;
+
+    cJSON *root_1 = NULL;
+	cJSON *arr = NULL;
+    cJSON *objread = NULL;
+    cJSON *itemread = NULL;
+
     int i = 0;
 
     /* Our "days of the week" array: */
@@ -138,16 +146,25 @@ static void create_objects(void)
     volatile double zero = 0.0;
 
     /* Here we construct some JSON standards, from the JSON site. */
-
+#if 0
     /* Our "Video" datatype: */
     root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "name", cJSON_CreateString("Jack (\"Bee\") Nimble"));
+    //cJSON_AddItemToObject(root, "name", cJSON_CreateString("Jack (\"Bee\") Nimble"));
+    cJSON_AddStringToObject(root, "name", "Jack");
     cJSON_AddItemToObject(root, "format", fmt = cJSON_CreateObject());
     cJSON_AddStringToObject(fmt, "type", "rect");
     cJSON_AddNumberToObject(fmt, "width", 1920);
     cJSON_AddNumberToObject(fmt, "height", 1080);
     cJSON_AddFalseToObject (fmt, "interlace");
     cJSON_AddNumberToObject(fmt, "frame rate", 24);
+	cJSON_AddRawToObject(fmt, "raw_key", "raw_value");
+    root_1 = cJSON_AddObjectToObject(fmt, "Object");
+    cJSON_AddStringToObject(root_1, "type", "rect");
+	arr = cJSON_AddArrayToObject(fmt, "Array");
+
+    cJSON_AddItemToArray(arr, cJSON_CreateNumber(11));
+    cJSON_AddItemToArray(arr, cJSON_CreateNumber(22));
+    cJSON_AddItemToArray(arr, cJSON_CreateNumber(33));
 
     /* Print to text */
     if (print_preallocated(root) != 0) {
@@ -155,6 +172,7 @@ static void create_objects(void)
         exit(0);
     }
     cJSON_Delete(root);
+
 
     /* Our "days of the week" array: */
     root = cJSON_CreateStringArray(strings, 7);
@@ -179,6 +197,7 @@ static void create_objects(void)
         exit(0);
     }
     cJSON_Delete(root);
+#endif
 
     /* Our "gallery" item: */
     root = cJSON_CreateObject();
@@ -198,6 +217,7 @@ static void create_objects(void)
     }
     cJSON_Delete(root);
 
+#if 0
     /* Our array of "records": */
     root = cJSON_CreateArray();
     for (i = 0; i < 2; i++)
@@ -229,6 +249,32 @@ static void create_objects(void)
         exit(0);
     }
     cJSON_Delete(root);
+#endif
+}
+
+#define MAX_LINE (256)
+void json_read_test(void)
+{
+    cJSON *root = NULL;
+
+    char buf[MAX_LINE];
+    FILE *fp;
+    int len;
+    if((fp = fopen("D:/Github/cjson_study/read.json","r")) == NULL)
+    {
+        perror("没有找到相关文件：");
+        exit (1) ;
+    }
+
+    memset(buf, 0x00, MAX_LINE);
+    fread(buf,sizeof(char),MAX_LINE,fp);
+    printf("%s\n%d\n",buf, strlen(buf));
+
+    root = cJSON_Parse(buf);
+
+    cJSON*  item = cJSON_GetObjectItem(root, "name1");
+    printf("type = %d\n", item->type);
+    printf("name1 = %d\n", item->valueint);
 }
 
 int main()
@@ -238,6 +284,8 @@ int main()
 
     /* Now some samplecode for building objects concisely: */
     create_objects();
+
+    json_read_test();
 
     return 0;
 }
